@@ -38,4 +38,6 @@ using Token = boost::variant<
     IdentifierToken, 
     NumberToken>;
 
+char get_next_char(std::istream& input);
+
 Token get_token(std::istream& inupt);

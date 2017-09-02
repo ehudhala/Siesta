@@ -14,6 +14,14 @@ int NumberToken::get_val() const {
     return m_val;
 }
 
-Token get_token(std::istream& inupt) {
+char get_next_char(std::istream& input) {
+    char c;
+    input >> c;
+    return c;
+}
+
+Token get_token(std::istream& input) {
+    input >> std::skipws;
+    char curr_char = get_next_char(input);
     return EofToken();
 }
