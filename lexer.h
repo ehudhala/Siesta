@@ -27,7 +27,7 @@ class ExternToken : public IdentifierToken {
 
 class NumberToken {
 public:
-    NumberToken(int val);
+    NumberToken(double val);
 
     double get_val() const;
 private:

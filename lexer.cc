@@ -9,7 +9,7 @@ const std::string& IdentifierToken::get_identifier() const {
     return m_identifier;
 }
 
-NumberToken::NumberToken(int val) : m_val(val) {}
+NumberToken::NumberToken(double val) : m_val(val) {}
 
 double NumberToken::get_val() const {
     return m_val;
@@ -17,7 +17,9 @@ double NumberToken::get_val() const {
 
 Token get_identifier_token(std::istream& input) {
     std::string identifier;
-    input >> identifier;
+    while (std::isalnum(input.peek()) || input.peek() == '_') {
+        identifier += input.get();
+    }
 
     if (identifier == "def") {
         return DefToken(identifier);

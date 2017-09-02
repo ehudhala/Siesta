@@ -10,12 +10,20 @@ TEST(get_identifier_token, splits_identifier_by_whitespace) {
     ASSERT_EQ("identifier", token.get_identifier());
 }
 
-// TODO:
-//TEST(get_identifier_token, splits_identifier_by_symbols) {
-//    std::istringstream stream("identifier;not_identifier_anymore");
-//    auto token = boost::get<IdentifierToken>(get_identifier_token(stream));
-//    ASSERT_EQ("identifier", token.get_identifier());
-//}
+TEST(get_identifier_token, splits_identifier_when_not_alphanumeric) {
+    std::istringstream stream("identifier#another;another_again(yet_again)");
+    auto token = boost::get<IdentifierToken>(get_identifier_token(stream));
+    ASSERT_EQ("identifier", token.get_identifier());
+    stream.get();
+    token = boost::get<IdentifierToken>(get_identifier_token(stream));
+    ASSERT_EQ("another", token.get_identifier());
+    stream.get();
+    token = boost::get<IdentifierToken>(get_identifier_token(stream));
+    ASSERT_EQ("another_again", token.get_identifier());
+    stream.get();
+    token = boost::get<IdentifierToken>(get_identifier_token(stream));
+    ASSERT_EQ("yet_again", token.get_identifier());
+}
 
 TEST(get_identifier_token, returns_def_token) {
     std::istringstream stream("def foo();");
@@ -29,18 +37,28 @@ TEST(get_identifier_token, returns_extern_token) {
     ASSERT_EQ("extern", token.get_identifier());
 }
 
-TEST(get_number_token, integer) {
+TEST(get_number_token, integer_num) {
     std::istringstream stream("1234");
     auto token = boost::get<NumberToken>(get_number_token(stream));
     ASSERT_EQ(1234, token.get_val());
 }
 
-// TODO: more tests to get-Num_token, test_get_token with nums.
+TEST(get_number_token, double_num) {
+    std::istringstream stream("12.3456");
+    auto token = boost::get<NumberToken>(get_number_token(stream));
+    ASSERT_EQ(12.3456, token.get_val());
+}
 
 TEST(get_token, recognizes_identifier) {
     std::istringstream stream("ident");
     auto token = boost::get<IdentifierToken>(get_token(stream));
     ASSERT_EQ("ident", token.get_identifier());
+}
+
+TEST(get_token, recognizes_number) {
+    std::istringstream stream("1234");
+    auto token = boost::get<NumberToken>(get_token(stream));
+    ASSERT_EQ(1234, token.get_val());
 }
 
 TEST(get_token, skips_whitespace) {
