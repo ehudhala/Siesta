@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
 
-TEST(a, b) {
+TEST(get_token, dummy) {
     ASSERT_TRUE(true);
 }
