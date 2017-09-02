@@ -35,6 +35,7 @@ private:
 };
 
 class CharToken {
+public:
     CharToken(char val);
 
     char get_val() const;

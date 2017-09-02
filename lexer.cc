@@ -1,3 +1,5 @@
+#include <functional>
+#include <map>
 #include <cctype>
 
 #include "lexer.h"
@@ -69,5 +71,5 @@ Token get_token(std::istream& input) {
         return EofToken();
     }
 
-    return EofToken();
+    return CharToken(input.get());
 }

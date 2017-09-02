@@ -89,6 +89,12 @@ TEST(get_token, recognizes_eof_after_identifier) {
     boost::get<EofToken>(get_token(stream));
 }
 
+TEST(get_token, returns_char_token_when_unknown) {
+    std::istringstream stream("(func)");
+    auto token = boost::get<CharToken>(get_token(stream));
+    ASSERT_EQ('(', token.get_val());
+}
+
 TEST(get_token, skips_whitespace) {
     std::istringstream stream("  \t\t  ident");
     auto token = boost::get<IdentifierToken>(get_token(stream));
