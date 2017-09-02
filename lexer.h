@@ -34,12 +34,21 @@ private:
     double m_val;
 };
 
+class CharToken {
+    CharToken(char val);
+
+    char get_val() const;
+private:
+    char m_val;
+};
+
 using Token = boost::variant<
     EofToken, 
     DefToken, 
     ExternToken, 
     IdentifierToken, 
-    NumberToken>;
+    NumberToken,
+    CharToken>;
 
 Token get_identifier_token(std::istream& input);
 Token get_number_token(std::istream& input);

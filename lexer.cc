@@ -15,6 +15,12 @@ double NumberToken::get_val() const {
     return m_val;
 }
 
+CharToken::CharToken(char val) : m_val(val) {}
+
+char CharToken::get_val() const {
+    return m_val;
+}
+
 Token get_identifier_token(std::istream& input) {
     std::string identifier;
     while (std::isalnum(input.peek()) || input.peek() == '_') {
