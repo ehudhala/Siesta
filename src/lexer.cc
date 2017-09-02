@@ -1,5 +1,3 @@
-#include <functional>
-#include <map>
 #include <cctype>
 
 #include "lexer.h"
