@@ -1,5 +1,6 @@
 *.o
-test_main
+main
 *.vim
 *.swp
 *.swo
+*.d

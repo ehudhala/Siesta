@@ -1,6 +1,8 @@
 CXX = g++-7 -Wall -pedantic -std=c++14
-OBJECTS = lexer.o
-TEST_OBJECTS = test_lexer.o
+
+SRC    = $(wildcard *.cc)
+HEAD    = $(SRC:.cc=.h)
+OBJ    = $(SRC:.cc=.o)
 
 .PHONY: all
 .PHONY: test
@@ -8,14 +10,16 @@ TEST_OBJECTS = test_lexer.o
 
 all: test
 
-%.o: %.cc %.h %.inl
-	$(CXX) -c $< 
+%.o: %.cc
+	$(CXX) -c -MMD $<
 
-test_main: $(TEST_OBJECTS) $(OBJECTS)
-	$(CXX) $^ -lgtest -lgtest_main -lpthread -o test_main
+main: $(OBJ)
+	$(CXX) $^ -lgtest -lgtest_main -lpthread -o main
 
-test: test_main
-	./test_main
+test: main
+	./main
 
 clean:
-	rm -f *.o test_main
+	rm -f *.o *.d main
+
+-include *.d
