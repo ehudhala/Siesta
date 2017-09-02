@@ -38,6 +38,12 @@ Token get_number_token(std::istream& input) {
     return NumberToken(num);
 }
 
+Token handle_comment(std::istream& input) {
+    std::string comment;
+    std::getline(input, comment);
+    return get_token(input);
+}
+
 Token get_token(std::istream& input) {
     input >> std::ws;
 
@@ -47,6 +53,14 @@ Token get_token(std::istream& input) {
 
     if (std::isdigit(input.peek())) {
         return get_number_token(input);
+    }
+
+    if (input.peek() == '#') {
+        return handle_comment(input);
+    }
+
+    if (input.peek() == std::char_traits<char>::eof()) {
+        return EofToken();
     }
 
     return EofToken();

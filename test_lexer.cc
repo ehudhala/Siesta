@@ -49,6 +49,17 @@ TEST(get_number_token, double_num) {
     ASSERT_EQ(12.3456, token.get_val());
 }
 
+TEST(handle_comment, skips_after_newline) {
+    std::istringstream stream("#comment\nidentifier");
+    auto token = boost::get<IdentifierToken>(handle_comment(stream));
+    ASSERT_EQ("identifier", token.get_identifier());
+}
+
+TEST(handle_comment, skips_handles_eof) {
+    std::istringstream stream("#comment\n");
+    boost::get<EofToken>(handle_comment(stream));
+}
+
 TEST(get_token, recognizes_identifier) {
     std::istringstream stream("ident");
     auto token = boost::get<IdentifierToken>(get_token(stream));
@@ -61,9 +72,25 @@ TEST(get_token, recognizes_number) {
     ASSERT_EQ(1234, token.get_val());
 }
 
+TEST(get_token, recognizes_comment) {
+    std::istringstream stream("#comment");
+    boost::get<EofToken>(handle_comment(stream));
+}
+
+TEST(get_token, recognizes_eof) {
+    std::istringstream stream("");
+    boost::get<EofToken>(get_token(stream));
+}
+
+TEST(get_token, recognizes_eof_after_identifier) {
+    std::istringstream stream("ident");
+    auto token = boost::get<IdentifierToken>(get_token(stream));
+    ASSERT_EQ("ident", token.get_identifier());
+    boost::get<EofToken>(get_token(stream));
+}
+
 TEST(get_token, skips_whitespace) {
     std::istringstream stream("  \t\t  ident");
     auto token = boost::get<IdentifierToken>(get_token(stream));
     ASSERT_EQ("ident", token.get_identifier());
 }
-

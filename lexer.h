@@ -43,4 +43,5 @@ using Token = boost::variant<
 
 Token get_identifier_token(std::istream& input);
 Token get_number_token(std::istream& input);
+Token handle_comment(std::istream& input);
 Token get_token(std::istream& inupt);
