@@ -71,3 +71,9 @@ Token get_token(std::istream& input) {
 
     return CharToken(input.get());
 }
+
+Lexer::Lexer(std::istream& input) : m_input(input) {}
+
+Token Lexer::next_token() {
+    return get_token(m_input);
+}

@@ -100,3 +100,14 @@ TEST(get_token, skips_whitespace) {
     auto token = boost::get<IdentifierToken>(get_token(stream));
     ASSERT_EQ("ident", token.get_identifier());
 }
+
+TEST(lexer, uses_stream) {
+    std::istringstream stream("ident#comment\n12.34");
+    Lexer lexer(stream);
+    auto token = boost::get<IdentifierToken>(lexer.next_token());
+    ASSERT_EQ("ident", token.get_identifier());
+    auto num_token = boost::get<NumberToken>(lexer.next_token());
+    ASSERT_EQ(12.34, num_token.get_val());
+    Lexer same_stream_lexer(stream);
+    boost::get<EofToken>(same_stream_lexer.next_token());
+}
