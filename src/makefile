@@ -1,4 +1,4 @@
-CXX = g++-7 -Wall -pedantic -std=c++14
+CXX = g++-7 -Wall -pedantic -std=c++17
 
 SRC    = $(wildcard *.cc)
 HEAD    = $(SRC:.cc=.h)
