@@ -15,3 +15,20 @@ PrototypeAst::PrototypeAst(std::string name, std::vector<std::string> args)
 
 FunctionAst::FunctionAst(PrototypeAst proto, ExprAst body)
     : proto(std::move(proto)), body(std::move(body)) {}
+
+class expr_parser {
+public:
+    optional<ExprAst> operator()(const IdentifierToken&) const {
+        return NumberExprAst(5);
+    }
+
+    template <class T>
+    optional<ExprAst> operator()(const T&) const {
+        return optional<ExprAst>();
+    }
+};
+
+optional<ExprAst> parse_primary(Lexer& l) {
+    Token next(l.next_token());
+    return boost::apply_visitor(expr_parser(), next);
+}

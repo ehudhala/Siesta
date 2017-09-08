@@ -2,8 +2,13 @@
 
 #include <string>
 #include <vector>
+#include <experimental/optional>
 
 #include "boost/variant.hpp"
+
+#include "lexer.h"
+
+using std::experimental::optional;
 
 class NumberExprAst;
 class VariableExprAst;
@@ -72,3 +77,4 @@ public:
     ExprAst body;
 };
 
+optional<ExprAst> parse_primary(Lexer&);
