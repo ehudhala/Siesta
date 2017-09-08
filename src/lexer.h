@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include <sstream>
 
 #include "boost/variant.hpp"
 
@@ -54,8 +55,10 @@ Token get_token(std::istream& inupt);
 class Lexer {
 public:
     Lexer(std::istream& input);
+    Lexer(std::string input);
     Token next_token();
 
 private:
+    std::istringstream m_string;
     std::istream& m_input;
 };

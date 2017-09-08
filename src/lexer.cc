@@ -64,7 +64,8 @@ Token get_token(std::istream& input) {
     return CharToken(input.get());
 }
 
-Lexer::Lexer(std::istream& input) : m_input(input) {}
+Lexer::Lexer(std::istream& input) : m_string(""), m_input(input) {}
+Lexer::Lexer(std::string input) : m_string(input), m_input(m_string) {}
 
 Token Lexer::next_token() {
     return get_token(m_input);
