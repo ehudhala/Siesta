@@ -7,17 +7,11 @@ VariableExprAst::VariableExprAst(std::string name) : name(std::move(name)) {}
 BinaryExprAst::BinaryExprAst(char op, ExprAst left, ExprAst right)
     : op(op), left(std::move(left)), right(std::move(right)) {}
 
-const ExprAst& BinaryExprAst::get_left() const {
-    return left;
-}
-
-const ExprAst& BinaryExprAst::get_right() const {
-    return right;
-}
-
 CallExprAst::CallExprAst(std::string callee, std::vector<ExprAst> args) 
     : callee(std::move(callee)), args(std::move(args)) {}
 
-const std::vector<ExprAst>& CallExprAst::get_args() const {
-    return args;
-}
+PrototypeAst::PrototypeAst(std::string name, std::vector<std::string> args)
+    : name(std::move(name)), args(std::move(args)) {}
+
+FunctionAst::FunctionAst(PrototypeAst proto, ExprAst body)
+    : proto(std::move(proto)), body(std::move(body)) {}

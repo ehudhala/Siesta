@@ -10,12 +10,21 @@ class VariableExprAst;
 class BinaryExprAst;
 class CallExprAst;
 class PrototypeAst;
+class FunctionAst;
 
 using ExprAst = boost::variant<
     NumberExprAst, 
     VariableExprAst,
     boost::recursive_wrapper<BinaryExprAst>,
     boost::recursive_wrapper<CallExprAst>>;
+
+using Ast = boost::variant<
+    NumberExprAst, 
+    VariableExprAst,
+    boost::recursive_wrapper<BinaryExprAst>,
+    boost::recursive_wrapper<CallExprAst>,
+    boost::recursive_wrapper<PrototypeAst>,
+    boost::recursive_wrapper<FunctionAst>>;
 
 class NumberExprAst {
 public:
@@ -35,11 +44,7 @@ class BinaryExprAst {
 public:
     BinaryExprAst(char op, ExprAst left, ExprAst right);
 
-    const ExprAst& get_left() const;
-    const ExprAst& get_right() const;
-
     char op;
-private:
     ExprAst left, right;
 };
 
@@ -47,14 +52,23 @@ class CallExprAst {
 public:
     CallExprAst(std::string callee, std::vector<ExprAst> args);
 
-    const std::vector<ExprAst>& get_args() const;
-
     std::string callee;
-private:
     std::vector<ExprAst> args;
 };
 
 class PrototypeAst {
 public:
+    PrototypeAst(std::string name, std::vector<std::string> args);
 
+    std::string name;
+    std::vector<std::string> args;
 };
+
+class FunctionAst {
+public:
+    FunctionAst(PrototypeAst proto, ExprAst body);
+
+    PrototypeAst proto;
+    ExprAst body;
+};
+
