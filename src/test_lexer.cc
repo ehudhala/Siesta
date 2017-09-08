@@ -40,13 +40,13 @@ TEST(get_identifier_token, returns_extern_token) {
 TEST(get_number_token, integer_num) {
     std::istringstream stream("1234");
     auto token = boost::get<NumberToken>(get_number_token(stream));
-    ASSERT_EQ(1234, token.get_val());
+    ASSERT_EQ(1234, token.val);
 }
 
 TEST(get_number_token, double_num) {
     std::istringstream stream("12.3456");
     auto token = boost::get<NumberToken>(get_number_token(stream));
-    ASSERT_EQ(12.3456, token.get_val());
+    ASSERT_EQ(12.3456, token.val);
 }
 
 TEST(handle_comment, skips_after_newline) {
@@ -69,7 +69,7 @@ TEST(get_token, recognizes_identifier) {
 TEST(get_token, recognizes_number) {
     std::istringstream stream("1234");
     auto token = boost::get<NumberToken>(get_token(stream));
-    ASSERT_EQ(1234, token.get_val());
+    ASSERT_EQ(1234, token.val);
 }
 
 TEST(get_token, recognizes_comment) {
@@ -92,7 +92,7 @@ TEST(get_token, recognizes_eof_after_identifier) {
 TEST(get_token, returns_char_token_when_unknown) {
     std::istringstream stream("(func)");
     auto token = boost::get<CharToken>(get_token(stream));
-    ASSERT_EQ('(', token.get_val());
+    ASSERT_EQ('(', token.val);
 }
 
 TEST(get_token, skips_whitespace) {
@@ -107,7 +107,7 @@ TEST(lexer, uses_stream) {
     auto token = boost::get<IdentifierToken>(lexer.next_token());
     ASSERT_EQ("ident", token.get_identifier());
     auto num_token = boost::get<NumberToken>(lexer.next_token());
-    ASSERT_EQ(12.34, num_token.get_val());
+    ASSERT_EQ(12.34, num_token.val);
     Lexer same_stream_lexer(stream);
     boost::get<EofToken>(same_stream_lexer.next_token());
 }

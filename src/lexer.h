@@ -5,8 +5,7 @@
 
 #include "boost/variant.hpp"
 
-class EofToken {
-};
+class EofToken {};
 
 class IdentifierToken {
 public:
@@ -29,18 +28,14 @@ class NumberToken {
 public:
     NumberToken(double val);
 
-    double get_val() const;
-private:
-    double m_val;
+    double val;
 };
 
 class CharToken {
 public:
     CharToken(char val);
 
-    char get_val() const;
-private:
-    char m_val;
+    char val;
 };
 
 using Token = boost::variant<
