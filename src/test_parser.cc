@@ -8,14 +8,14 @@ TEST(parse_primary, parsing_non_expression_token_fails) {
     Lexer l("");
     std::ostringstream s;
     ASSERT_FALSE(parse_primary(l, s));
-    ASSERT_EQ(s.str(), "Unexpected token when expecting an expression");
+    ASSERT_EQ("Unexpected token when expecting an expression\n", s.str());
 }
 
 TEST(parse_primary, parsing_non_parentheses_char_fails) {
     Lexer l("$");
     std::ostringstream s;
     ASSERT_FALSE(parse_primary(l, s));
-    ASSERT_EQ(s.str(), "Unexpected token when expecting an expression");
+    ASSERT_EQ("Unexpected token when expecting an expression\n", s.str());
 }
 
 TEST(parse_primary, parsing_number_token) {
@@ -42,7 +42,7 @@ TEST(parse_paren, raises_error_when_not_closed) {
     Lexer l("(12345");
     std::ostringstream s;
     ASSERT_FALSE(parse_primary(l, s));
-    ASSERT_EQ(s.str(), "Expected ')'");
+    ASSERT_EQ("Expected ')'\n", s.str());
 }
 
 TEST(parse_identifier, variable) {
@@ -50,4 +50,62 @@ TEST(parse_identifier, variable) {
     std::ostringstream s;
     auto var = boost::get<VariableExprAst>(*parse_primary(l, s));
     ASSERT_EQ("variable", var.name);
+}
+
+TEST(parse_identifier_call, no_args) {
+    Lexer l("call()");
+    std::ostringstream s;
+    auto call = boost::get<CallExprAst>(*parse_primary(l, s));
+    ASSERT_EQ("call", call.callee);
+    ASSERT_EQ(0, call.args.size());
+}
+
+TEST(parse_identifier_call, one_arg) {
+    Lexer l("call(1234)");
+    std::ostringstream s;
+    auto call = boost::get<CallExprAst>(*parse_primary(l, s));
+    ASSERT_EQ("call", call.callee);
+    ASSERT_EQ(1, call.args.size());
+    ASSERT_EQ(1234, boost::get<NumberExprAst>(call.args.front()).val);
+}
+
+TEST(parse_identifier_call, many_args) {
+    Lexer l("call(1234, variable, (12345))");
+    std::ostringstream s;
+    auto call = boost::get<CallExprAst>(*parse_primary(l, s));
+    ASSERT_EQ("call", call.callee);
+    ASSERT_EQ(3, call.args.size());
+    ASSERT_EQ(1234, boost::get<NumberExprAst>(call.args[0]).val);
+    ASSERT_EQ("variable", boost::get<VariableExprAst>(call.args[1]).name);
+    ASSERT_EQ(12345, boost::get<NumberExprAst>(call.args[2]).val);
+}
+
+TEST(parse_identifier_call, no_comma) {
+    Lexer l("call(1234 variable)");
+    std::ostringstream s;
+    ASSERT_FALSE(parse_primary(l, s));
+    ASSERT_EQ("Expected ',' or ')' in argument list\n", s.str());
+}
+
+TEST(parse_identifier_call, arg_fails_to_parse) {
+    Lexer l("call($)");
+    std::ostringstream s;
+    ASSERT_FALSE(parse_primary(l, s));
+    ASSERT_EQ("Unexpected token when expecting an expression\n", s.str());
+}
+
+TEST(parse_identifier_call, comma_without_arg) {
+    Lexer l("call(1234,)");
+    std::ostringstream s;
+    auto call = boost::get<CallExprAst>(*parse_primary(l, s));
+    ASSERT_EQ("call", call.callee);
+    ASSERT_EQ(1, call.args.size());
+    ASSERT_EQ(1234, boost::get<NumberExprAst>(call.args.front()).val);
+}
+
+TEST(parse_identifier_call, no_closing_paren) {
+    Lexer l("call(1234");
+    std::ostringstream s;
+    ASSERT_FALSE(parse_primary(l, s));
+    ASSERT_EQ("Expected ',' or ')' in argument list\n", s.str());
 }

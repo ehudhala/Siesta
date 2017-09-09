@@ -34,6 +34,7 @@ public:
 
 using open_paren = std::integral_constant<char, '('>;
 using close_paren = std::integral_constant<char, ')'>;
+using comma = std::integral_constant<char, ','>;
 struct unknown_char {};
 
 template<class value>
@@ -52,6 +53,7 @@ using Token = boost::variant<
     NumberToken,
     CharToken<open_paren>,
     CharToken<close_paren>,
+    CharToken<comma>,
     CharToken<unknown_char>>;
 
 Token get_identifier_token(std::istream& input);
@@ -66,6 +68,7 @@ public:
     Lexer(std::string input);
     Token next_token();
 
+    Token curr_token;
 private:
     std::istringstream m_string;
     std::istream& m_input;

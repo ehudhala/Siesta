@@ -52,6 +52,8 @@ Token get_char_token(std::istream& input) {
         return CharToken<open_paren>(c);
     case ')':
         return CharToken<close_paren>(c);
+    case ',':
+        return CharToken<comma>(c);
     }
 }
 
@@ -77,9 +79,13 @@ Token get_token(std::istream& input) {
     return get_char_token(input);
 }
 
-Lexer::Lexer(std::istream& input) : m_string(""), m_input(input) {}
-Lexer::Lexer(std::string input) : m_string(input), m_input(m_string) {}
+Lexer::Lexer(std::istream& input) : m_string(""), m_input(input) {
+    next_token();
+}
+Lexer::Lexer(std::string input) : m_string(input), m_input(m_string) {
+    next_token();
+}
 
 Token Lexer::next_token() {
-    return get_token(m_input);
+    return curr_token = get_token(m_input);
 }
