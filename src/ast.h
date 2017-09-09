@@ -5,8 +5,6 @@
 
 #include "boost/variant.hpp"
 
-#include "lexer.h"
-
 class NumberExprAst;
 class VariableExprAst;
 class BinaryExprAst;
