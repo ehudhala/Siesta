@@ -1,5 +1,17 @@
 #include "parser.h"
 
+class is_closing_paren {
+public:
+    bool operator()(const CharToken<close_paren>&) const {
+        return true;
+    }
+
+    template <class T>
+    bool operator()(const T&) const {
+        return false;
+    }
+};
+
 class expr_parser {
 public:
     expr_parser(Lexer& lexer, std::ostream& error_stream) 
@@ -21,7 +33,7 @@ public:
         }
 
         auto next{lexer.next_token()};
-        if (!(next.type() == typeid(CharToken<close_paren>))) {
+        if (!(boost::apply_visitor(is_closing_paren(), next))) {
             error_stream << "Expected ')'";
             return optional<ExprAst>();
         }
