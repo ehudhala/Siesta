@@ -2,7 +2,8 @@
 
 class expr_parser {
 public:
-    expr_parser(std::ostream& error_stream) : error_stream(error_stream) {}
+    expr_parser(Lexer& lexer, std::ostream& error_stream) 
+        : lexer(lexer), error_stream(error_stream) {}
 
     optional<ExprAst> operator()(const NumberToken& token) const {
         return NumberExprAst(token.val);
@@ -14,8 +15,15 @@ public:
     }
 
     optional<ExprAst> parse_paren_expr(const CharToken&) const {
-        // TODO: implement
-        return NumberExprAst(5);
+        auto inner{parse_expression(lexer, error_stream)};
+        if (!inner) {
+            return inner;
+        }
+
+        auto next{lexer.next_token()};
+        // TODO: implement error if not ')'
+
+        return inner;
     }
 
     optional<ExprAst> operator()(const CharToken& token) const {
@@ -38,10 +46,16 @@ public:
     }
 
 private:
+    Lexer& lexer;
     std::ostream& error_stream;
 };
 
 optional<ExprAst> parse_primary(Lexer& l, std::ostream& error_stream) {
     Token next(l.next_token());
-    return boost::apply_visitor(expr_parser(error_stream), next);
+    return boost::apply_visitor(expr_parser(l, error_stream), next);
+}
+
+optional<ExprAst> parse_expression(Lexer& l, std::ostream& error_stream) {
+    // TODO: implement. this is only a prototype.
+    return parse_primary(l, error_stream);
 }

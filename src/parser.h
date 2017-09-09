@@ -8,3 +8,5 @@
 using std::experimental::optional;
 
 optional<ExprAst> parse_primary(Lexer&, std::ostream& error_stream);
+
+optional<ExprAst> parse_expression(Lexer&, std::ostream& error_stream);

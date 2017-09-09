@@ -25,3 +25,23 @@ TEST(parse_primary, parsing_number_token) {
     ASSERT_EQ(12345, boost::get<NumberExprAst>(*expr).val);
 }
 
+TEST(parse_paren, returning_inner_token) {
+    Lexer l("(12345)");
+    std::ostringstream s;
+    optional<ExprAst> expr = parse_primary(l, s);
+    ASSERT_EQ(12345, boost::get<NumberExprAst>(*expr).val);
+}
+
+TEST(parse_paren, returns_error_on_error) {
+    Lexer l("($)");
+    std::ostringstream s;
+    ASSERT_FALSE(parse_primary(l, s));
+}
+
+TEST(parse_paren, raises_error_when_not_closed) {
+    Lexer l("(12345");
+    std::ostringstream s;
+    ASSERT_FALSE(parse_primary(l, s));
+    ASSERT_EQ(s.str(), "expected ')'");
+}
+
