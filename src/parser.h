@@ -7,4 +7,4 @@
 
 using std::experimental::optional;
 
-optional<ExprAst> parse_primary(Lexer&);
+optional<ExprAst> parse_primary(Lexer&, std::ostream& error_stream);
