@@ -32,6 +32,11 @@ public:
     double val;
 };
 
+using open_paren = std::integral_constant<char, '('>;
+using close_paren = std::integral_constant<char, ')'>;
+struct unknown_char {};
+
+template<class value>
 class CharToken {
 public:
     CharToken(char val);
@@ -45,12 +50,15 @@ using Token = boost::variant<
     ExternToken, 
     IdentifierToken, 
     NumberToken,
-    CharToken>;
+    CharToken<open_paren>,
+    CharToken<close_paren>,
+    CharToken<unknown_char>>;
 
 Token get_identifier_token(std::istream& input);
 Token get_number_token(std::istream& input);
 Token handle_comment(std::istream& input);
 Token get_token(std::istream& inupt);
+Token get_char_token(std::istream& input);
 
 class Lexer {
 public:

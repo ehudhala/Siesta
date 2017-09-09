@@ -11,7 +11,8 @@ const std::string& IdentifierToken::get_identifier() const {
 
 NumberToken::NumberToken(double value) : val(value) {}
 
-CharToken::CharToken(char value) : val(value) {}
+template <class v>
+CharToken<v>::CharToken(char value) : val(value) {}
 
 Token get_identifier_token(std::istream& input) {
     std::string identifier;
@@ -42,6 +43,18 @@ Token handle_comment(std::istream& input) {
     return get_token(input);
 }
 
+Token get_char_token(std::istream& input) {
+    char c = input.get();
+    switch (c) {
+    default:
+        return CharToken<unknown_char>(c);
+    case '(':
+        return CharToken<open_paren>(c);
+    case ')':
+        return CharToken<close_paren>(c);
+    }
+}
+
 Token get_token(std::istream& input) {
     input >> std::ws;
 
@@ -61,7 +74,7 @@ Token get_token(std::istream& input) {
         return EofToken();
     }
 
-    return CharToken(input.get());
+    return get_char_token(input);
 }
 
 Lexer::Lexer(std::istream& input) : m_string(""), m_input(input) {}

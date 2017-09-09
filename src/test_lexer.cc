@@ -91,7 +91,7 @@ TEST(get_token, recognizes_eof_after_identifier) {
 
 TEST(get_token, returns_char_token_when_unknown) {
     std::istringstream stream("(func)");
-    auto token = boost::get<CharToken>(get_token(stream));
+    auto token = boost::get<CharToken<open_paren>>(get_token(stream));
     ASSERT_EQ('(', token.val);
 }
 

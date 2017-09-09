@@ -14,7 +14,7 @@ public:
         return NumberExprAst(5);
     }
 
-    optional<ExprAst> parse_paren_expr(const CharToken&) const {
+    optional<ExprAst> operator()(const CharToken<open_paren>&) const {
         auto inner{parse_expression(lexer, error_stream)};
         if (!inner) {
             return inner;
@@ -26,21 +26,8 @@ public:
         return inner;
     }
 
-    optional<ExprAst> operator()(const CharToken& token) const {
-        switch (token.val) {
-        default:
-            return unexpected_token();
-        case '(':
-            return parse_paren_expr(token);
-        }
-    }
-
     template <class T>
     optional<ExprAst> operator()(const T&) const {
-        return unexpected_token();
-    }
-
-    optional<ExprAst> unexpected_token() const {
         error_stream << "Unexpected token when expecting an expression";
         return optional<ExprAst>();
     }

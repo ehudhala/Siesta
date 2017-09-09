@@ -42,6 +42,6 @@ TEST(parse_paren, raises_error_when_not_closed) {
     Lexer l("(12345");
     std::ostringstream s;
     ASSERT_FALSE(parse_primary(l, s));
-    ASSERT_EQ(s.str(), "expected ')'");
+    ASSERT_EQ(s.str(), "Expected ')'");
 }
 
