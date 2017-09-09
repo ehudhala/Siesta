@@ -21,7 +21,10 @@ public:
         }
 
         auto next{lexer.next_token()};
-        // TODO: implement error if not ')'
+        if (!(next.type() == typeid(CharToken<close_paren>))) {
+            error_stream << "Expected ')'";
+            return optional<ExprAst>();
+        }
 
         return inner;
     }
