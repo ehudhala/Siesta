@@ -45,3 +45,9 @@ TEST(parse_paren, raises_error_when_not_closed) {
     ASSERT_EQ(s.str(), "Expected ')'");
 }
 
+TEST(parse_identifier, variable) {
+    Lexer l("variable");
+    std::ostringstream s;
+    auto var = boost::get<VariableExprAst>(*parse_primary(l, s));
+    ASSERT_EQ("variable", var.name);
+}

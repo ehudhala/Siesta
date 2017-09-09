@@ -1,8 +1,9 @@
 #include "parser.h"
 
-class is_closing_paren {
+template <class char_>
+class is_char {
 public:
-    bool operator()(const CharToken<close_paren>&) const {
+    bool operator()(const CharToken<char_>&) const {
         return true;
     }
 
@@ -21,9 +22,15 @@ public:
         return NumberExprAst(token.val);
     }
 
-    optional<ExprAst> operator()(const IdentifierToken&) const {
-        // TODO: implement
-        return NumberExprAst(5);
+    optional<ExprAst> operator()(const IdentifierToken& token) const {
+        const std::string& name = token.get_identifier();
+
+        auto next{lexer.next_token()};
+        if (!(boost::apply_visitor(is_char<open_paren>(), next))) {
+            return VariableExprAst(name);
+        }
+
+        return VariableExprAst(name);
     }
 
     optional<ExprAst> operator()(const CharToken<open_paren>&) const {
@@ -33,7 +40,7 @@ public:
         }
 
         auto next{lexer.next_token()};
-        if (!(boost::apply_visitor(is_closing_paren(), next))) {
+        if (!(boost::apply_visitor(is_char<close_paren>(), next))) {
             error_stream << "Expected ')'";
             return optional<ExprAst>();
         }
