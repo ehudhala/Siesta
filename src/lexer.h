@@ -3,8 +3,11 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <experimental/optional>
 
 #include "boost/variant.hpp"
+
+using std::experimental::optional;
 
 class EofToken {};
 
@@ -89,3 +92,5 @@ private:
     std::istringstream m_string;
     std::istream& m_input;
 };
+
+optional<char> get_char(Token);

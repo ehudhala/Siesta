@@ -101,3 +101,20 @@ Lexer::Lexer(std::string input) : m_string(input), m_input(m_string) {
 Token Lexer::next_token() {
     return curr_token = get_token(m_input);
 }
+
+class get_char_from_token {
+public:
+    template<class value>
+    optional<char> operator()(const CharToken<value>& token) const {
+        return token.val;
+    }
+
+    template<class T>
+    optional<char> operator()(const T&) const {
+        return optional<char>();
+    }
+};
+
+optional<char> get_char(Token token) {
+    return boost::apply_visitor(get_char_from_token(), token);
+}

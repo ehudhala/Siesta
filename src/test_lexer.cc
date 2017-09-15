@@ -113,3 +113,20 @@ TEST(lexer, uses_stream) {
     Lexer same_stream_lexer(stream);
     boost::get<EofToken>(same_stream_lexer.next_token());
 }
+
+TEST(get_char, char_token) {
+    CharToken<chars::open_paren> open_paren('(');
+    CharToken<chars::close_paren> close_paren(')');
+    CharToken<chars::comma> comma(',');
+    CharToken<chars::plus> plus('+');
+    ASSERT_EQ('(', *get_char(open_paren));
+    ASSERT_EQ(')', *get_char(close_paren));
+    ASSERT_EQ(',', *get_char(comma));
+    ASSERT_EQ('+', *get_char(plus));
+}
+
+TEST(get_char, non_char_token) {
+    ASSERT_FALSE(get_char(EofToken()));
+    ASSERT_FALSE(get_char(DefToken("def")));
+    ASSERT_FALSE(get_char(NumberToken(1234)));
+}
