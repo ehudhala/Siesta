@@ -16,7 +16,7 @@ bool is_char(const Token& token);
 
 optional<ExprAst> parse_primary(Lexer& l, std::ostream& error_stream);
 
-optional<ExprAst> parse_bin_op_rhs(int expr_prec, ExprAst lhs, 
+optional<ExprAst> parse_bin_op_rhs(int lhs_prec, ExprAst lhs, 
         Lexer& l, std::ostream& error_stream);
 
 optional<ExprAst> parse_expression(Lexer& l, std::ostream& error_stream);

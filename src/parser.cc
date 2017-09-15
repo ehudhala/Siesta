@@ -93,13 +93,40 @@ optional<ExprAst> parse_primary(Lexer& l, std::ostream& error_stream) {
     return boost::apply_visitor(expr_parser(l, error_stream), l.curr_token);
 }
 
-optional<ExprAst> parse_bin_op_rhs(int expr_prec, ExprAst lhs, 
+optional<ExprAst> parse_bin_op_rhs(int lhs_prec, ExprAst lhs,
         Lexer& l, std::ostream& error_stream) {
+    // TODO: refactor and add tests!!!
+    while (true) {
+        int curr_prec = get_bin_op_precedence(l.curr_token);
+        if (curr_prec < lhs_prec) {
+            return lhs;
+        }
+        auto optional_op = get_char(l.curr_token);
+        if (!optional_op) {
+            error_stream << 
+                "Unexpected token when expected a binary operation" << std::endl;
+            return optional<ExprAst>();
+        }
+        l.next_token(); // Eat op.
+
+        auto optional_rhs = parse_primary(l, error_stream);
+        if (!optional_rhs) {
+            return optional_rhs;
+        }
+        int rhs_prec = get_bin_op_precedence(l.curr_token);
+        if (curr_prec < rhs_prec) {
+            optional_rhs = parse_bin_op_rhs(curr_prec + 1, *optional_rhs, 
+                    l, error_stream);
+            if (!optional_rhs) {
+                return optional_rhs;
+            }
+        }
+        lhs = BinaryExprAst(*optional_op, lhs, *optional_rhs);
+    }
     return lhs;
 }
 
 optional<ExprAst> parse_expression(Lexer& l, std::ostream& error_stream) {
-    // TODO: implement. this is only a prototype.
     auto lhs = parse_primary(l, error_stream);
     if (!lhs) {
         return lhs;
