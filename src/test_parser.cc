@@ -60,6 +60,14 @@ TEST(parse_identifier_call, no_args) {
     ASSERT_EQ(0, call.args.size());
 }
 
+TEST(parse_identifier_call, no_args_eats_closing_paren) {
+    Lexer l("call() 12345");
+    std::ostringstream s;
+    parse_primary(l, s); // Eat call
+    optional<ExprAst> expr = parse_primary(l, s);
+    ASSERT_EQ(12345, boost::get<NumberExprAst>(*expr).val);
+}
+
 TEST(parse_identifier_call, one_arg) {
     Lexer l("call(1234)");
     std::ostringstream s;
@@ -108,4 +116,34 @@ TEST(parse_identifier_call, no_closing_paren) {
     std::ostringstream s;
     ASSERT_FALSE(parse_primary(l, s));
     ASSERT_EQ("Expected ',' or ')' in argument list\n", s.str());
+}
+
+TEST(get_bin_op_precedence, mul_equals_div) {
+    int mul = get_bin_op_precedence(CharToken<chars::mul>('*'));
+    int div = get_bin_op_precedence(CharToken<chars::div>('/'));
+    ASSERT_EQ(mul, div);
+}
+
+TEST(get_bin_op_precedence, plus_equals_minus) {
+    int plus = get_bin_op_precedence(CharToken<chars::plus>('+'));
+    int minus = get_bin_op_precedence(CharToken<chars::minus>('-'));
+    ASSERT_EQ(plus, minus);
+}
+
+TEST(get_bin_op_precedence, lt_equals_gt) {
+    int lt = get_bin_op_precedence(CharToken<chars::lt>('<'));
+    int gt = get_bin_op_precedence(CharToken<chars::gt>('>'));
+    ASSERT_EQ(lt, gt);
+}
+
+TEST(get_bin_op_precedence, mul_larger_than_plus) {
+    int mul = get_bin_op_precedence(CharToken<chars::mul>('*'));
+    int plus = get_bin_op_precedence(CharToken<chars::plus>('+'));
+    ASSERT_GT(mul, plus);
+}
+
+TEST(get_bin_op_precedence, plus_larger_than_lt) {
+    int plus = get_bin_op_precedence(CharToken<chars::plus>('+'));
+    int lt = get_bin_op_precedence(CharToken<chars::lt>('<'));
+    ASSERT_GT(plus, lt);
 }

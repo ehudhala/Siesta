@@ -32,10 +32,20 @@ public:
     double val;
 };
 
-using open_paren = std::integral_constant<char, '('>;
-using close_paren = std::integral_constant<char, ')'>;
-using comma = std::integral_constant<char, ','>;
-struct unknown_char {};
+namespace chars {
+// TODO: refactor uses of chars.
+// Currently, if we add a char we need to update the Token variant, get_char_token function and get_bin_op_precedence function.
+    using open_paren = std::integral_constant<char, '('>;
+    using close_paren = std::integral_constant<char, ')'>;
+    using comma = std::integral_constant<char, ','>;
+    using plus = std::integral_constant<char, '+'>;
+    using minus = std::integral_constant<char, '-'>;
+    using mul = std::integral_constant<char, '*'>;
+    using div = std::integral_constant<char, '/'>;
+    using lt = std::integral_constant<char, '<'>;
+    using gt = std::integral_constant<char, '>'>;
+    struct unknown_char {};
+}
 
 template<class value>
 class CharToken {
@@ -51,10 +61,16 @@ using Token = boost::variant<
     ExternToken, 
     IdentifierToken, 
     NumberToken,
-    CharToken<open_paren>,
-    CharToken<close_paren>,
-    CharToken<comma>,
-    CharToken<unknown_char>>;
+    CharToken<chars::open_paren>,
+    CharToken<chars::close_paren>,
+    CharToken<chars::comma>,
+    CharToken<chars::plus>,
+    CharToken<chars::minus>,
+    CharToken<chars::mul>,
+    CharToken<chars::div>,
+    CharToken<chars::lt>,
+    CharToken<chars::gt>,
+    CharToken<chars::unknown_char>>;
 
 Token get_identifier_token(std::istream& input);
 Token get_number_token(std::istream& input);

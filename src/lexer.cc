@@ -47,13 +47,25 @@ Token get_char_token(std::istream& input) {
     char c = input.get();
     switch (c) {
     default:
-        return CharToken<unknown_char>(c);
+        return CharToken<chars::unknown_char>(c);
     case '(':
-        return CharToken<open_paren>(c);
+        return CharToken<chars::open_paren>(c);
     case ')':
-        return CharToken<close_paren>(c);
+        return CharToken<chars::close_paren>(c);
     case ',':
-        return CharToken<comma>(c);
+        return CharToken<chars::comma>(c);
+    case '+':
+        return CharToken<chars::plus>(c);
+    case '-':
+        return CharToken<chars::minus>(c);
+    case '*':
+        return CharToken<chars::mul>(c);
+    case '/':
+        return CharToken<chars::div>(c);
+    case '<':
+        return CharToken<chars::lt>(c);
+    case '>':
+        return CharToken<chars::gt>(c);
     }
 }
 

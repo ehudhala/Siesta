@@ -4,6 +4,8 @@
 
 #include "lexer.h"
 
+using namespace chars;
+
 TEST(get_identifier_token, splits_identifier_by_whitespace) {
     std::istringstream stream("identifier not_identifier_anymore");
     auto token = boost::get<IdentifierToken>(get_identifier_token(stream));

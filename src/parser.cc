@@ -57,9 +57,6 @@ public:
 
         lexer.next_token(); // Eat '('. now either ')' or arg.
 
-        if (is_char<close_paren>(lexer.curr_token))
-            return CallExprAst(name, std::move(args));
-
         // TODO: refactor!
         while (!is_char<close_paren>(lexer.curr_token)) {
             if (auto arg = parse_expression(lexer, error_stream))
@@ -67,7 +64,7 @@ public:
             else
                 return arg;
 
-            if ((is_char<close_paren>(lexer.curr_token)))
+            if (is_char<close_paren>(lexer.curr_token))
                 break;
 
             if (!is_char<comma>(lexer.curr_token)) {
@@ -78,7 +75,6 @@ public:
         }
 
         lexer.next_token(); // Eat ')'.
-
         return CallExprAst(name, std::move(args));
     }
 
@@ -97,7 +93,53 @@ optional<ExprAst> parse_primary(Lexer& l, std::ostream& error_stream) {
     return boost::apply_visitor(expr_parser(l, error_stream), l.curr_token);
 }
 
+optional<ExprAst> parse_bin_op_rhs(int expr_prec, ExprAst lhs, 
+        Lexer& l, std::ostream& error_stream) {
+    return lhs;
+}
+
 optional<ExprAst> parse_expression(Lexer& l, std::ostream& error_stream) {
     // TODO: implement. this is only a prototype.
-    return parse_primary(l, error_stream);
+    auto lhs = parse_primary(l, error_stream);
+    if (!lhs) {
+        return lhs;
+    }
+
+    return parse_bin_op_rhs(0, *lhs, l, error_stream);
+}
+
+class bin_op_precednece_map {
+public:
+    template <class T>
+    int operator()(const T&) const {
+        return -1;
+    }
+
+    int operator()(const CharToken<chars::lt>&) const {
+        return 1;
+    }
+
+    int operator()(const CharToken<chars::gt>&) const {
+        return 1;
+    }
+
+    int operator()(const CharToken<chars::plus>&) const {
+        return 2;
+    }
+
+    int operator()(const CharToken<chars::minus>&) const {
+        return 2;
+    }
+
+    int operator()(const CharToken<chars::mul>&) const {
+        return 3;
+    }
+
+    int operator()(const CharToken<chars::div>&) const {
+        return 3;
+    }
+};
+
+int get_bin_op_precedence(const Token& token) {
+    return boost::apply_visitor(bin_op_precednece_map(), token);
 }
