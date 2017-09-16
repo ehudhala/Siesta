@@ -125,6 +125,11 @@ TEST(get_char, char_token) {
     ASSERT_EQ('+', *get_char(plus));
 }
 
+TEST(get_char, unknown_char_token) {
+    CharToken<chars::unknown_char> question('?');
+    ASSERT_EQ('?', *get_char(question));
+}
+
 TEST(get_char, non_char_token) {
     ASSERT_FALSE(get_char(EofToken()));
     ASSERT_FALSE(get_char(DefToken("def")));

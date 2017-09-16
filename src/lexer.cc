@@ -105,7 +105,11 @@ Token Lexer::next_token() {
 class get_char_from_token {
 public:
     template<class value>
-    optional<char> operator()(const CharToken<value>& token) const {
+    optional<char> operator()(const CharToken<value>&) const {
+        return value::value;
+    }
+
+    optional<char> operator()(const CharToken<chars::unknown_char>& token) const {
         return token.val;
     }
 
