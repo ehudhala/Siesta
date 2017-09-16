@@ -97,31 +97,23 @@ optional<ExprAst> parse_bin_op_rhs(int lhs_prec, ExprAst lhs,
         Lexer& l, std::ostream& error_stream) {
     // TODO: refactor and add tests!!!
     while (true) {
-        int curr_prec = get_bin_op_precedence(l.curr_token);
-        if (curr_prec < lhs_prec) {
+        auto curr_prec = get_bin_op_precedence(l.curr_token);
+        if (!curr_prec || *curr_prec < lhs_prec)
             return lhs;
-        }
-        auto optional_op = get_char(l.curr_token);
-        if (!optional_op) {
-            error_stream << 
-                "Unexpected token when expected a binary operation" << std::endl;
-            return optional<ExprAst>();
-        }
+        auto op = *get_char(l.curr_token); // op is checked in curr_prec already.
         l.next_token(); // Eat op.
 
-        auto optional_rhs = parse_primary(l, error_stream);
-        if (!optional_rhs) {
-            return optional_rhs;
+        auto rhs = parse_primary(l, error_stream);
+        if (!rhs)
+            return rhs;
+
+        auto rhs_prec = get_bin_op_precedence(l.curr_token);
+        if (rhs_prec && curr_prec < *rhs_prec) {
+            rhs = parse_bin_op_rhs(*curr_prec + 1, *rhs, l, error_stream);
+            if (!rhs)
+                return rhs;
         }
-        int rhs_prec = get_bin_op_precedence(l.curr_token);
-        if (curr_prec < rhs_prec) {
-            optional_rhs = parse_bin_op_rhs(curr_prec + 1, *optional_rhs, 
-                    l, error_stream);
-            if (!optional_rhs) {
-                return optional_rhs;
-            }
-        }
-        lhs = BinaryExprAst(*optional_op, lhs, *optional_rhs);
+        lhs = BinaryExprAst(op, lhs, *rhs);
     }
     return lhs;
 }
@@ -135,38 +127,25 @@ optional<ExprAst> parse_expression(Lexer& l, std::ostream& error_stream) {
     return parse_bin_op_rhs(0, *lhs, l, error_stream);
 }
 
-class bin_op_precednece_map {
-public:
-    template <class T>
-    int operator()(const T&) const {
-        return -1;
-    }
+std::map<char, int> get_prec_map() {
+    return std::map<char, int>{
+        {'<', 1},
+        {'>', 1},
+        {'+', 2},
+        {'-', 2},
+        {'*', 3},
+        {'/', 3},
+    };
+}
 
-    int operator()(const CharToken<chars::lt>&) const {
-        return 1;
+optional<int> get_bin_op_precedence(const Token& token, const std::map<char, int>& prec_map) {
+    auto optional_token_char = get_char(token);
+    if (!optional_token_char) {
+        return optional<int>{};
     }
-
-    int operator()(const CharToken<chars::gt>&) const {
-        return 1;
+    auto prec = prec_map.find(*optional_token_char);
+    if (prec == prec_map.end()) {
+        return optional<int>{};
     }
-
-    int operator()(const CharToken<chars::plus>&) const {
-        return 2;
-    }
-
-    int operator()(const CharToken<chars::minus>&) const {
-        return 2;
-    }
-
-    int operator()(const CharToken<chars::mul>&) const {
-        return 3;
-    }
-
-    int operator()(const CharToken<chars::div>&) const {
-        return 3;
-    }
-};
-
-int get_bin_op_precedence(const Token& token) {
-    return boost::apply_visitor(bin_op_precednece_map(), token);
+    return prec->second;
 }

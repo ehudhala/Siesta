@@ -21,4 +21,8 @@ optional<ExprAst> parse_bin_op_rhs(int lhs_prec, ExprAst lhs,
 
 optional<ExprAst> parse_expression(Lexer& l, std::ostream& error_stream);
 
-int get_bin_op_precedence(const Token& token);
+std::map<char, int> get_prec_map();
+
+static std::map<char, int> operator_prec_map = get_prec_map();
+
+optional<int> get_bin_op_precedence(const Token& token, const std::map<char, int>& prec_map=operator_prec_map);

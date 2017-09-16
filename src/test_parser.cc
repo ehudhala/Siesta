@@ -118,32 +118,45 @@ TEST(parse_identifier_call, no_closing_paren) {
     ASSERT_EQ("Expected ',' or ')' in argument list\n", s.str());
 }
 
-TEST(get_bin_op_precedence, mul_equals_div) {
-    int mul = get_bin_op_precedence(CharToken<chars::mul>('*'));
-    int div = get_bin_op_precedence(CharToken<chars::div>('/'));
-    ASSERT_EQ(mul, div);
+TEST(prec_map, mul_equals_div) {
+    auto prec = get_prec_map();
+    ASSERT_EQ(prec['*'], prec['/']);
 }
 
-TEST(get_bin_op_precedence, plus_equals_minus) {
-    int plus = get_bin_op_precedence(CharToken<chars::plus>('+'));
-    int minus = get_bin_op_precedence(CharToken<chars::minus>('-'));
-    ASSERT_EQ(plus, minus);
+TEST(prec_map, plus_equals_minus) {
+    auto prec = get_prec_map();
+    ASSERT_EQ(prec['+'], prec['-']);
 }
 
-TEST(get_bin_op_precedence, lt_equals_gt) {
-    int lt = get_bin_op_precedence(CharToken<chars::lt>('<'));
-    int gt = get_bin_op_precedence(CharToken<chars::gt>('>'));
-    ASSERT_EQ(lt, gt);
+TEST(prec_map, lt_equals_gt) {
+    auto prec = get_prec_map();
+    ASSERT_EQ(prec['<'], prec['>']);
 }
 
-TEST(get_bin_op_precedence, mul_larger_than_plus) {
-    int mul = get_bin_op_precedence(CharToken<chars::mul>('*'));
-    int plus = get_bin_op_precedence(CharToken<chars::plus>('+'));
-    ASSERT_GT(mul, plus);
+TEST(prec_map, mul_larger_than_plus) {
+    auto prec = get_prec_map();
+    ASSERT_GT(prec['*'], prec['+']);
 }
 
-TEST(get_bin_op_precedence, plus_larger_than_lt) {
-    int plus = get_bin_op_precedence(CharToken<chars::plus>('+'));
-    int lt = get_bin_op_precedence(CharToken<chars::lt>('<'));
-    ASSERT_GT(plus, lt);
+TEST(prec_map, plus_larger_than_lt) {
+    auto prec = get_prec_map();
+    ASSERT_GT(prec['+'], prec['<']);
+}
+
+TEST(get_bin_op_precedence, not_char_token) {
+    optional<int> eof = get_bin_op_precedence(EofToken(), std::map<char, int>{});
+    ASSERT_FALSE(eof);
+}
+
+TEST(get_bin_op_precedence, char_token_not_in_map) {
+    optional<int> plus = get_bin_op_precedence(CharToken<chars::plus>('+'), 
+            std::map<char, int>{});
+    ASSERT_FALSE(plus);
+}
+
+TEST(get_bin_op_precedence, char_token_in_map) {
+    optional<int> plus = get_bin_op_precedence(CharToken<chars::plus>('+'), 
+            std::map<char, int>{{'+', 1}});
+    ASSERT_TRUE(bool(plus));
+    ASSERT_EQ(*plus, 1);
 }
