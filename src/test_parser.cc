@@ -160,3 +160,22 @@ TEST(get_bin_op_precedence, char_token_in_map) {
     ASSERT_TRUE(bool(plus));
     ASSERT_EQ(*plus, 1);
 }
+
+TEST(parse_bin_op_rhs, examples) {
+    Lexer l("1 + 2 * 3 / 4 - 5 * 6");
+    std::ostringstream s;
+    optional<ExprAst> expr = parse_expression(l, s);
+    auto expected = BinaryExprAst('-',
+        BinaryExprAst('+', 
+            NumberExprAst(1), 
+            BinaryExprAst('/', 
+                BinaryExprAst('*', 
+                    NumberExprAst(2),
+                    NumberExprAst(3)),
+                NumberExprAst(4))),
+        BinaryExprAst('*', 
+            NumberExprAst(5),
+            NumberExprAst(6))
+    );
+    ASSERT_TRUE(expected == *expr);
+}
