@@ -101,7 +101,7 @@ optional<ExprAst> parse_bin_op_rhs(int lhs_prec, ExprAst lhs,
         if (!curr_prec || *curr_prec < lhs_prec)
             return lhs;
         auto op = *get_char(l.curr_token); // op is checked in curr_prec already.
-        l.next_token(); // Eat op.
+        l.next_token();
 
         auto rhs = parse_primary(l, error_stream);
         if (!rhs)
