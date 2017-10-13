@@ -95,6 +95,20 @@ optional<ExprAst> parse_primary(Lexer& l, std::ostream& error_stream) {
 
 optional<ExprAst> parse_bin_op_rhs(int lhs_prec, ExprAst lhs,
         Lexer& l, std::ostream& error_stream) {
+    // lhs_prec - precedence of left and prev.
+    // curr_prec - precedence of left and right.
+    // rhs_prec - precedence of right and next.
+    // We have three cases:
+    //     curr < lhs 
+    //          We dropped precedence, as in x * y _+_ z.
+    //          We return the current lhs. 
+    //          This will happen at the end of the recursion.
+    //     lhs < curr && curr < rhs 
+    //          We have more precedence than the next, as in x _*_ y + z.
+    //          We return a binary operation.
+    //     lhs < curr && curr > rhs
+    //          We have less precedence than the next, as in x _*_ y / z.
+    //          We recurse to parse the right hand side as a binary operation too.
     // TODO: refactor and add tests!!!
     auto curr_prec = get_bin_op_precedence(l.curr_token);
     if (!curr_prec || *curr_prec < lhs_prec)
