@@ -71,3 +71,5 @@ public:
     PrototypeAst proto;
     ExprAst body;
 };
+
+bool operator==(const Ast& lhs, const Ast& rhs);
