@@ -179,3 +179,10 @@ TEST(parse_bin_op_rhs, examples) {
     );
     ASSERT_TRUE(expected == *expr);
 }
+
+TEST(parse_bin_op, two_ops) {
+    Lexer l("1 + * 2");
+    std::ostringstream s;
+    parse_expression(l, s);
+    ASSERT_EQ("Unexpected token when expecting an expression\n", s.str());
+}
