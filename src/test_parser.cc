@@ -22,14 +22,14 @@ TEST(parse_primary, parsing_number_token) {
     Lexer l("12345");
     std::ostringstream s;
     optional<ExprAst> expr = parse_primary(l, s);
-    ASSERT_EQ(12345, boost::get<NumberExprAst>(*expr).val);
+    ASSERT_TRUE(NumberExprAst(12345) == *expr);
 }
 
 TEST(parse_paren, returning_inner_token) {
     Lexer l("(12345)");
     std::ostringstream s;
     optional<ExprAst> expr = parse_primary(l, s);
-    ASSERT_EQ(12345, boost::get<NumberExprAst>(*expr).val);
+    ASSERT_TRUE(NumberExprAst(12345) == *expr);
 }
 
 TEST(parse_paren, returns_error_on_error) {
@@ -48,16 +48,15 @@ TEST(parse_paren, raises_error_when_not_closed) {
 TEST(parse_identifier, variable) {
     Lexer l("variable");
     std::ostringstream s;
-    auto var = boost::get<VariableExprAst>(*parse_primary(l, s));
-    ASSERT_EQ("variable", var.name);
+    auto var = parse_primary(l, s);
+    ASSERT_TRUE(VariableExprAst("variable") == *var);
 }
 
 TEST(parse_identifier_call, no_args) {
     Lexer l("call()");
     std::ostringstream s;
-    auto call = boost::get<CallExprAst>(*parse_primary(l, s));
-    ASSERT_EQ("call", call.callee);
-    ASSERT_EQ(0, call.args.size());
+    auto call = parse_primary(l, s);
+    ASSERT_TRUE(CallExprAst("call", std::vector<ExprAst>{}) == *call);
 }
 
 TEST(parse_identifier_call, no_args_eats_closing_paren) {
@@ -65,27 +64,29 @@ TEST(parse_identifier_call, no_args_eats_closing_paren) {
     std::ostringstream s;
     parse_primary(l, s); // Eat call
     optional<ExprAst> expr = parse_primary(l, s);
-    ASSERT_EQ(12345, boost::get<NumberExprAst>(*expr).val);
+    ASSERT_TRUE(NumberExprAst(12345) == *expr);
 }
 
 TEST(parse_identifier_call, one_arg) {
     Lexer l("call(1234)");
     std::ostringstream s;
-    auto call = boost::get<CallExprAst>(*parse_primary(l, s));
-    ASSERT_EQ("call", call.callee);
-    ASSERT_EQ(1, call.args.size());
-    ASSERT_EQ(1234, boost::get<NumberExprAst>(call.args.front()).val);
+    auto call = parse_primary(l, s);
+    auto expected = CallExprAst("call", std::vector<ExprAst>{NumberExprAst(1234)});
+    ASSERT_TRUE(expected == *call);
 }
 
 TEST(parse_identifier_call, many_args) {
     Lexer l("call(1234, variable, (12345))");
     std::ostringstream s;
-    auto call = boost::get<CallExprAst>(*parse_primary(l, s));
-    ASSERT_EQ("call", call.callee);
-    ASSERT_EQ(3, call.args.size());
-    ASSERT_EQ(1234, boost::get<NumberExprAst>(call.args[0]).val);
-    ASSERT_EQ("variable", boost::get<VariableExprAst>(call.args[1]).name);
-    ASSERT_EQ(12345, boost::get<NumberExprAst>(call.args[2]).val);
+    auto call = parse_primary(l, s);
+    auto expected = CallExprAst("call", 
+        std::vector<ExprAst>{
+            NumberExprAst(1234), 
+            VariableExprAst("variable"), 
+            NumberExprAst(12345)
+        }
+    );
+    ASSERT_TRUE(expected == *call);
 }
 
 TEST(parse_identifier_call, no_comma) {
@@ -105,10 +106,9 @@ TEST(parse_identifier_call, arg_fails_to_parse) {
 TEST(parse_identifier_call, comma_without_arg) {
     Lexer l("call(1234,)");
     std::ostringstream s;
-    auto call = boost::get<CallExprAst>(*parse_primary(l, s));
-    ASSERT_EQ("call", call.callee);
-    ASSERT_EQ(1, call.args.size());
-    ASSERT_EQ(1234, boost::get<NumberExprAst>(call.args.front()).val);
+    auto call = parse_primary(l, s);
+    auto expected = CallExprAst("call", std::vector<ExprAst>{NumberExprAst(1234)});
+    ASSERT_TRUE(expected == *call);
 }
 
 TEST(parse_identifier_call, no_closing_paren) {
