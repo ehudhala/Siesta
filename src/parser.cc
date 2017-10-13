@@ -96,26 +96,24 @@ optional<ExprAst> parse_primary(Lexer& l, std::ostream& error_stream) {
 optional<ExprAst> parse_bin_op_rhs(int lhs_prec, ExprAst lhs,
         Lexer& l, std::ostream& error_stream) {
     // TODO: refactor and add tests!!!
-    while (true) {
-        auto curr_prec = get_bin_op_precedence(l.curr_token);
-        if (!curr_prec || *curr_prec < lhs_prec)
-            return lhs;
-        auto op = *get_char(l.curr_token); // op is checked in curr_prec already.
-        l.next_token();
+    auto curr_prec = get_bin_op_precedence(l.curr_token);
+    if (!curr_prec || *curr_prec < lhs_prec)
+        return lhs;
+    auto op = *get_char(l.curr_token); // op is checked in curr_prec already.
+    l.next_token();
 
-        auto rhs = parse_primary(l, error_stream);
+    auto rhs = parse_primary(l, error_stream);
+    if (!rhs)
+        return rhs;
+
+    auto rhs_prec = get_bin_op_precedence(l.curr_token);
+    if (rhs_prec && curr_prec < *rhs_prec) {
+        rhs = parse_bin_op_rhs(*curr_prec + 1, *rhs, l, error_stream);
         if (!rhs)
             return rhs;
-
-        auto rhs_prec = get_bin_op_precedence(l.curr_token);
-        if (rhs_prec && curr_prec < *rhs_prec) {
-            rhs = parse_bin_op_rhs(*curr_prec + 1, *rhs, l, error_stream);
-            if (!rhs)
-                return rhs;
-        }
-        lhs = BinaryExprAst(op, lhs, *rhs);
     }
-    return lhs;
+    lhs = BinaryExprAst(op, lhs, *rhs);
+    return parse_bin_op_rhs(lhs_prec, lhs, l, error_stream);
 }
 
 optional<ExprAst> parse_expression(Lexer& l, std::ostream& error_stream) {
