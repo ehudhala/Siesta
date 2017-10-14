@@ -169,6 +169,7 @@ public:
     optional<std::string> operator()(const IdentifierToken& token) const {
         return token.get_identifier();
     }
+
     template <class T>
     optional<std::string> operator()(const T&) const {
         return optional<std::string>{};
@@ -183,6 +184,7 @@ optional<PrototypeAst> parse_prototype(Lexer& l, std::ostream& error_stream) {
         return optional<PrototypeAst>{};
     }
     l.next_token();
+
     if (!is_char<open_paren>(l.curr_token)) {
         error_stream << "Expected '(' in prototype" << std::endl;
         return optional<PrototypeAst>();
@@ -192,6 +194,7 @@ optional<PrototypeAst> parse_prototype(Lexer& l, std::ostream& error_stream) {
     std::vector<std::string> args;
     while (auto arg = boost::apply_visitor(get_identifier_name(), l.curr_token)) {
         args.push_back(*arg);
+        l.next_token();
     }
 
     if (!is_char<close_paren>(l.curr_token)) {
