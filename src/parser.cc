@@ -163,3 +163,56 @@ optional<ExprAst> parse_expression(Lexer& l, std::ostream& error_stream) {
 
     return parse_bin_op_rhs(0, *lhs, l, error_stream);
 }
+
+class get_identifier_name {
+public:
+    optional<std::string> operator()(const IdentifierToken& token) const {
+        return token.get_identifier();
+    }
+    template <class T>
+    optional<std::string> operator()(const T&) const {
+        return optional<std::string>{};
+    }
+};
+
+optional<PrototypeAst> parse_prototype(Lexer& l, std::ostream& error_stream) {
+    // TODO: test
+    auto name = boost::apply_visitor(get_identifier_name(), l.curr_token);
+    if (!name) {
+        error_stream << "Expected function name in prototype" << std::endl;
+        return optional<PrototypeAst>{};
+    }
+    l.next_token();
+    if (!is_char<open_paren>(l.curr_token)) {
+        error_stream << "Expected '(' in prototype" << std::endl;
+        return optional<PrototypeAst>();
+    }
+    l.next_token();
+
+    std::vector<std::string> args;
+    while (auto arg = boost::apply_visitor(get_identifier_name(), l.curr_token)) {
+        args.push_back(*arg);
+    }
+
+    if (!is_char<close_paren>(l.curr_token)) {
+        error_stream << "Expected ')' in prototype" << std::endl;
+        return optional<PrototypeAst>();
+    }
+    l.next_token();
+
+    return PrototypeAst(*name, std::move(args));
+}
+
+optional<FunctionAst> parse_definition(Lexer& l, std::ostream& error_stream) {
+    l.next_token(); // Eat def.
+
+    auto proto = parse_prototype(l, error_stream);
+    if (!proto)
+        return optional<FunctionAst>{};
+
+    auto expression = parse_expression(l, error_stream);
+    if (!expression)
+        return optional<FunctionAst>{};
+
+    return FunctionAst(std::move(*proto), std::move(*expression));
+}

@@ -26,3 +26,6 @@ std::map<char, int> get_prec_map();
 static std::map<char, int> operator_prec_map = get_prec_map();
 
 optional<int> get_bin_op_precedence(const Token& token, const std::map<char, int>& prec_map=operator_prec_map);
+
+optional<PrototypeAst> parse_prototype(Lexer& l, std::ostream& error_stream);
+optional<FunctionAst> parse_definition(Lexer& l, std::ostream& error_stream);
