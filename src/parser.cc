@@ -221,3 +221,11 @@ optional<PrototypeAst> parse_extern(Lexer& l, std::ostream& error_stream) {
     l.next_token(); // Eat extern.
     return parse_prototype(l, error_stream);
 }
+
+optional<FunctionAst> parse_top_level_expr(Lexer& l, std::ostream& error_stream) {
+    auto expression = parse_expression(l, error_stream);
+    if (!expression)
+        return optional<FunctionAst>{};
+    PrototypeAst proto{"", std::vector<std::string>{}};
+    return FunctionAst(std::move(proto), std::move(*expression));
+}

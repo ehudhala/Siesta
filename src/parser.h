@@ -32,3 +32,5 @@ optional<PrototypeAst> parse_prototype(Lexer& l, std::ostream& error_stream);
 optional<FunctionAst> parse_definition(Lexer& l, std::ostream& error_stream);
 
 optional<PrototypeAst> parse_extern(Lexer& l, std::ostream& error_stream);
+
+optional<FunctionAst> parse_top_level_expr(Lexer& l, std::ostream& error_stream);
