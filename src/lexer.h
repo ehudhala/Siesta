@@ -47,6 +47,7 @@ namespace chars {
     using div = std::integral_constant<char, '/'>;
     using lt = std::integral_constant<char, '<'>;
     using gt = std::integral_constant<char, '>'>;
+    using semicolon = std::integral_constant<char, ';'>;
     struct unknown_char {};
 }
 
@@ -73,6 +74,7 @@ using Token = boost::variant<
     CharToken<chars::div>,
     CharToken<chars::lt>,
     CharToken<chars::gt>,
+    CharToken<chars::semicolon>,
     CharToken<chars::unknown_char>>;
 
 Token get_identifier_token(std::istream& input);

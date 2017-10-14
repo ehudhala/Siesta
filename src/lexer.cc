@@ -66,6 +66,8 @@ Token get_char_token(std::istream& input) {
         return CharToken<chars::lt>(c);
     case '>':
         return CharToken<chars::gt>(c);
+    case ';':
+        return CharToken<chars::semicolon>(c);
     }
 }
 
