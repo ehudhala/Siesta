@@ -216,3 +216,8 @@ optional<FunctionAst> parse_definition(Lexer& l, std::ostream& error_stream) {
 
     return FunctionAst(std::move(*proto), std::move(*expression));
 }
+
+optional<PrototypeAst> parse_extern(Lexer& l, std::ostream& error_stream) {
+    l.next_token(); // Eat extern.
+    return parse_prototype(l, error_stream);
+}
