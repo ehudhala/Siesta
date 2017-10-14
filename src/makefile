@@ -3,6 +3,7 @@ CXX = g++-7 -Wall -pedantic -std=c++17
 SRC    = $(wildcard *.cc)
 HEAD    = $(SRC:.cc=.h)
 OBJ    = $(SRC:.cc=.o)
+NO_TEST_OBJ = $(patsubst test_%,%,$(OBJ))
 
 .PHONY: all
 .PHONY: test
@@ -12,6 +13,9 @@ all: test
 
 %.o: %.cc
 	$(CXX) -c -MMD $<
+
+driver: $(NO_TEST_OBJ)
+	$(CXX) $^ -o driver
 
 main: $(OBJ)
 	$(CXX) $^ -lgtest -lgtest_main -lpthread -o main
