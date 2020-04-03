@@ -9,17 +9,10 @@ const std::string& IdentifierToken::get_identifier() const {
     return m_identifier;
 }
 
-NumberToken::NumberToken(double val) : m_val(val) {}
+NumberToken::NumberToken(double value) : val(value) {}
 
-double NumberToken::get_val() const {
-    return m_val;
-}
-
-CharToken::CharToken(char val) : m_val(val) {}
-
-char CharToken::get_val() const {
-    return m_val;
-}
+template <class v>
+CharToken<v>::CharToken(char value) : val(value) {}
 
 Token get_identifier_token(std::istream& input) {
     std::string identifier;
@@ -50,6 +43,34 @@ Token handle_comment(std::istream& input) {
     return get_token(input);
 }
 
+Token get_char_token(std::istream& input) {
+    char c = input.get();
+    switch (c) {
+    default:
+        return CharToken<chars::unknown_char>(c);
+    case '(':
+        return CharToken<chars::open_paren>(c);
+    case ')':
+        return CharToken<chars::close_paren>(c);
+    case ',':
+        return CharToken<chars::comma>(c);
+    case '+':
+        return CharToken<chars::plus>(c);
+    case '-':
+        return CharToken<chars::minus>(c);
+    case '*':
+        return CharToken<chars::mul>(c);
+    case '/':
+        return CharToken<chars::div>(c);
+    case '<':
+        return CharToken<chars::lt>(c);
+    case '>':
+        return CharToken<chars::gt>(c);
+    case ';':
+        return CharToken<chars::semicolon>(c);
+    }
+}
+
 Token get_token(std::istream& input) {
     input >> std::ws;
 
@@ -69,11 +90,37 @@ Token get_token(std::istream& input) {
         return EofToken();
     }
 
-    return CharToken(input.get());
+    return get_char_token(input);
 }
 
-Lexer::Lexer(std::istream& input) : m_input(input) {}
+Lexer::Lexer(std::istream& input) : m_string(""), m_input(input) {
+    next_token();
+}
+Lexer::Lexer(std::string input) : m_string(input), m_input(m_string) {
+    next_token();
+}
 
 Token Lexer::next_token() {
-    return get_token(m_input);
+    return curr_token = get_token(m_input);
+}
+
+class get_char_from_token {
+public:
+    template<class value>
+    optional<char> operator()(const CharToken<value>&) const {
+        return value::value;
+    }
+
+    optional<char> operator()(const CharToken<chars::unknown_char>& token) const {
+        return token.val;
+    }
+
+    template<class T>
+    optional<char> operator()(const T&) const {
+        return optional<char>();
+    }
+};
+
+optional<char> get_char(Token token) {
+    return boost::apply_visitor(get_char_from_token(), token);
 }
