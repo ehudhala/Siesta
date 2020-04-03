@@ -1,5 +1,7 @@
 *.o
-test_main
+main
+driver
 *.vim
 *.swp
 *.swo
+*.d
