@@ -2,6 +2,7 @@
 The Siesta Programming Language.
 
 ## What is this?
+
 The goal of this project is to learn both c++ and compiler theory.
 The result will be a compiler for a simple language using LLVM.
 
